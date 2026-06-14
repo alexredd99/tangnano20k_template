@@ -41,7 +41,7 @@ src/main.py -d <USB DEVICE PATH>
 ### Synthesis (TODO)
 - Tool flow (yosys, nextpnr-himbaechel, etc)
 
-### Notes
+## Notes
 - [`gowin_rPLL`](hardware/rtl/common/gowin_rPLL.sv) is a wrapper for the actual Gowin [`rPLL`](https://github.com/YosysHQ/yosys/blob/main/techlibs/gowin/cells_sim.v#L1913) and contains a very basic PLL behavioral model. Because `yosys-slang` has [issues with parameterized blackboxes](https://github.com/povik/yosys-slang/issues/296) we map instances of `gowin_rPLL` to `rPLL` for synthesis and map them back (to `gowin_rPLL`) in the synthesized Verilog netlist for post-synthesis simulation (see [`synth.tcl`](scripts/synth.tcl)).
 - By their nature, USB-serial adapters introduce some amount of communication latency due to USB-polling. Because the BL616 UART does not expose hardware flow control to the FPGA, it's very easy to overflow its receiver buffer if the design generates data too quickly. Essentially, the host machine may not be able to read from the BL616 quickly enough to avoid overflow. One workaround is to chunk data so that it aligns with the BL616's 32 byte buffers (see [`transmit_fast`](src/main.py#27))
 
