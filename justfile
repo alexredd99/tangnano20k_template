@@ -16,6 +16,12 @@ _rtl_dir       := _hardware_dir / "rtl"
 _testbench_dir := _hardware_dir / "testbench"
 _simcells_dir  := shell(_yosys_config + " " + join("--datdir", "gowin"))
 
+# Variables
+freq         := "100"
+family_yosys := "gw2a"
+family       := "GW2A-18C"
+device       := "GW2AR-LV18QN88C8/I7"
+
 _default:
   @just --list
 
@@ -48,7 +54,7 @@ _sim_post_synth testbench: _prep
     1_synth_netlist.v \
   && {{join("obj_dir", "V" + testbench)}}
 
-# Design
+# Simulate design
 [group("Simulation")]
 [working-directory: 'build']
 simulate testbench="top_tb" post_synth="false": _prep
@@ -61,7 +67,7 @@ simulate testbench="top_tb" post_synth="false": _prep
 [working-directory: 'build']
 synthesize: _prep
   {{_yosys}} -D SYNTHESIS -c {{_script_dir / "synth.tcl"}} -- \
-      --family "gw2a" \
+      --family {{family_yosys}} \
       --top "top" \
       --json_netlist "1_synth_netlist.json" \
       --verilog_netlist "1_synth_netlist.v" \
@@ -74,12 +80,12 @@ place_and_route: synthesize
   {{_nextpnr_himbaechel}} \
       --json "1_synth_netlist.json" \
       --top "top" \
-      --freq 100 \
+      --freq {{freq}} \
       --write "2_pnr_netlist.json" \
       --placed-svg "2_placement.svg" \
       --routed-svg "2_routing.svg" \
-      --device "GW2AR-LV18QN88C8/I7" \
-      --vopt family="GW2A-18C" \
+      --device {{device}} \
+      --vopt family={{family}} \
       --vopt cst={{_hardware_dir / "constraints.cst"}} \
       --report "tmp.json" \
       --detailed-timing-report 2>&1 \
@@ -92,7 +98,7 @@ place_and_route: synthesize
 [working-directory: 'build']
 pack_bitstream: place_and_route
   {{_gowin_pack}} \
-      --device "GW2AR-LV18QN88C8/I7" \
+      --device {{device}} \
       --output "3_bitstream.fs" \
       "2_pnr_netlist.json"
 
