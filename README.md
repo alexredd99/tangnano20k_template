@@ -34,7 +34,9 @@ src/main.py -d <USB DEVICE PATH>
 ```
 
 ### Simulation (TODO)
-- Behavioral and post-synthesis
+- `just simulate <MODULE NAME> <POST SYNTHESIS SIMULATION = true/false>`
+- Behavioral `just simulate top_tb <false>`
+- Post-synthesis `just simulate top_tb true` (must run `just synthesize` first)
 
 ### Synthesis (TODO)
 - Tool flow (yosys, nextpnr-himbaechel, etc)
